@@ -2,7 +2,7 @@ import { IconButton, Modal, ModalOverlay, Tooltip, useDisclosure } from '@chakra
 import { SearchIcon } from '@chakra-ui/icons'
 import { NodeObject } from 'force-graph'
 import { SearchContent } from './SearchContent'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { NodeById } from '../../pages'
 
 export const Search: React.FC<{
@@ -11,6 +11,44 @@ export const Search: React.FC<{
   onClickResultItem?: (nodeId: string) => void
 }> = ({ nodeById, setPreviewNode, onClickResultItem }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  // Full note text isn't part of the graph data Emacs sends over the
+  // websocket (it's only kept in the files on disk), so it's fetched
+  // lazily from org-roam-ui's own `/node/:id` servlet the first time
+  // search is opened, then cached here (above <Modal>, so it survives
+  // the modal unmounting) and topped up for any newly-seen node ids.
+  const [contentById, setContentById] = useState<{ [id: string]: string }>({})
+  const fetchedIdsRef = useRef<Set<string>>(new Set())
+  const [contentLoading, setContentLoading] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+    const missingIds = Object.keys(nodeById).filter((id) => !fetchedIdsRef.current.has(id))
+    if (!missingIds.length) {
+      return
+    }
+    missingIds.forEach((id) => fetchedIdsRef.current.add(id))
+    setContentLoading(true)
+    Promise.all(
+      missingIds.map((id) =>
+        fetch(`/node/${encodeURIComponent(id)}`)
+          .then((res) => res.text())
+          .then((text) => [id, text] as const)
+          .catch(() => [id, ''] as const),
+      ),
+    ).then((entries) => {
+      setContentById((current) => {
+        const next = { ...current }
+        entries.forEach(([id, text]) => {
+          next[id] = text
+        })
+        return next
+      })
+      setContentLoading(false)
+    })
+  }, [isOpen, nodeById])
 
   const handleOnClickResultItem = useCallback(
     (id: string) => {
@@ -41,7 +79,12 @@ export const Search: React.FC<{
       </Tooltip>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <SearchContent nodeById={nodeById} onClickResultItem={handleOnClickResultItem} />
+        <SearchContent
+          nodeById={nodeById}
+          contentById={contentById}
+          contentLoading={contentLoading}
+          onClickResultItem={handleOnClickResultItem}
+        />
       </Modal>
     </>
   )
