@@ -21,6 +21,20 @@ export const Search: React.FC<{
   const fetchedIdsRef = useRef<Set<string>>(new Set())
   const [contentLoading, setContentLoading] = useState(false)
 
+  // `nodeById' gets a new object every time Emacs pushes fresh graph data
+  // (on every org-roam save, since `org-roam-ui-update-on-save' is on) --
+  // drop the cached content so a just-edited note's search index isn't
+  // stale. The next effect below lazily refetches once search is open.
+  const prevNodeByIdRef = useRef(nodeById)
+  useEffect(() => {
+    if (prevNodeByIdRef.current === nodeById) {
+      return
+    }
+    prevNodeByIdRef.current = nodeById
+    fetchedIdsRef.current = new Set()
+    setContentById({})
+  }, [nodeById])
+
   useEffect(() => {
     if (!isOpen) {
       return

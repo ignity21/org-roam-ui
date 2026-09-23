@@ -1,48 +1,46 @@
 import { ListItem, Tag, Text, Wrap, WrapItem, Heading } from '@chakra-ui/react'
-import Fuse from 'fuse.js'
 import { useContext, useMemo } from 'react'
 import { ThemeContext } from '../../util/themecontext'
-import { highlightMatches } from './highlight'
-import { SearchableNode } from './SearchContent'
+import { highlightWords } from './highlight'
+import { NodeMatch } from './matchNodes'
 
 type Props = {
-  result: Fuse.FuseResult<SearchableNode>
+  match: NodeMatch
   onClick: (id: string) => void
 }
 
 const EXCERPT_RADIUS = 60
 
-// Fuse gives match indices into the full note text; a search result should
-// show a short excerpt around the match, not the whole note.
-const buildExcerpt = (text: string, indices: readonly Fuse.RangeTuple[]) => {
-  if (!indices.length) {
-    return { excerpt: '', indices: [] as Fuse.RangeTuple[] }
+// Trims a long snippet (a heading line or the note body) down to a window
+// around the first matched word, so the result doesn't show the whole note.
+const buildExcerpt = (text: string, words: string[]) => {
+  const lower = text.toLowerCase()
+  const firstIndex = words.reduce((min, word) => {
+    const idx = lower.indexOf(word)
+    return idx === -1 ? min : Math.min(min, idx)
+  }, Infinity)
+  if (!Number.isFinite(firstIndex)) {
+    return text.slice(0, EXCERPT_RADIUS * 2)
   }
-  const start = Math.max(0, indices[0][0] - EXCERPT_RADIUS)
-  const end = Math.min(text.length, indices[indices.length - 1][1] + 1 + EXCERPT_RADIUS)
+  const start = Math.max(0, firstIndex - EXCERPT_RADIUS)
+  const end = Math.min(text.length, firstIndex + EXCERPT_RADIUS)
   const prefix = start > 0 ? '…' : ''
   const suffix = end < text.length ? '…' : ''
-  const excerpt = prefix + text.slice(start, end).trim() + suffix
-  const shift = prefix.length - start
-  const shifted = indices
-    .filter(([s, e]) => s >= start && e < end)
-    .map(([s, e]) => [s + shift, e + shift] as Fuse.RangeTuple)
-  return { excerpt, indices: shifted }
+  return prefix + text.slice(start, end).trim() + suffix
 }
 
-export const SearchResultItem: React.FC<Props> = ({ result, onClick }) => {
+export const SearchResultItem: React.FC<Props> = ({ match, onClick }) => {
   const { highlightColor, emacsTheme } = useContext(ThemeContext)
   type Theme = { [color: string]: string }
   const themeColors = emacsTheme[1] as Theme
-  const { id, tags, title, content } = result.item
-  const matches = result.matches
+  const { id, tags, title } = match.node
 
-  const titleMatch = useMemo(() => matches?.find((m) => m.key === 'title'), [matches])
-  const contentMatch = useMemo(() => matches?.find((m) => m.key === 'content'), [matches])
-  const contentExcerpt = useMemo(
-    () => (contentMatch ? buildExcerpt(content, contentMatch.indices) : null),
-    [content, contentMatch],
-  )
+  const excerpt = useMemo(() => {
+    if (match.category === 'title') {
+      return null
+    }
+    return buildExcerpt(match.snippet, match.words)
+  }, [match])
 
   return (
     <ListItem
@@ -54,7 +52,7 @@ export const SearchResultItem: React.FC<Props> = ({ result, onClick }) => {
       onClick={() => onClick(id)}
     >
       <Heading size="sm">
-        {titleMatch ? highlightMatches(title, titleMatch.indices) : title}
+        {match.category === 'title' ? highlightWords(title, match.words) : title}
       </Heading>
       {!!tags?.length && (
         <Wrap marginTop={2} spacingY={1}>
@@ -67,9 +65,14 @@ export const SearchResultItem: React.FC<Props> = ({ result, onClick }) => {
           ))}
         </Wrap>
       )}
-      {contentExcerpt && (
+      {excerpt && (
         <Text fontSize="sm" opacity={0.8} marginTop={2} noOfLines={3}>
-          {highlightMatches(contentExcerpt.excerpt, contentExcerpt.indices)}
+          {match.category === 'heading' && (
+            <Text as="span" fontWeight="semibold" opacity={0.7}>
+              {'# '}
+            </Text>
+          )}
+          {highlightWords(excerpt, match.words)}
         </Text>
       )}
     </ListItem>
