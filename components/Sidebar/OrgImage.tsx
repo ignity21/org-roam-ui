@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import path from 'path'
 import { Container } from '@chakra-ui/react'
+import { isStatic, staticUrl } from '../../util/static'
 //import '../../../public/placeholder.png'
 
 export interface OrgImageProps {
@@ -44,10 +45,15 @@ export const OrgImage = (props: OrgImageProps) => {
   const fullPath =
     path.isAbsolute(srcName) || srcName.slice(0, 1) === '~' ? srcName : path.join(dir, srcName)
   const encodedPath = encodeURIComponent(encodeURIComponent(fullPath))
+  // Static snapshots export node files relative to the roam root, so a
+  // resource path resolves to its copy under `files/`.
+  const imageUrl = isStatic
+    ? staticUrl(`files/${fullPath.split('/').map(encodeURIComponent).join('/')}`)
+    : `http://localhost:35901/img/${encodedPath}`
 
   return (
     <Container my={4} position="relative">
-      <img alt="Wow, an image." src={`http://localhost:35901/img/${encodedPath}`} />
+      <img alt="Wow, an image." src={imageUrl} />
     </Container>
   )
 }

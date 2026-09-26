@@ -54,6 +54,7 @@ import { Tweaks } from '../components/Tweaks'
 import { usePersistantState } from '../util/persistant-state'
 import { ThemeContext, ThemeContextProps } from '../util/themecontext'
 import { openNodeInEmacs } from '../util/webSocketFunctions'
+import { isStatic, staticUrl } from '../util/static'
 import { drawLabels } from '../components/Graph/drawLabels'
 import { VariablesContext } from '../util/variablesContext'
 import { findNthNeighbors } from '../util/findNthNeighbour'
@@ -430,6 +431,19 @@ export function GraphPage() {
   }
 
   useEffect(() => {
+    if (isStatic) {
+      Promise.all(
+        ['data/variables.json', 'data/graphdata.json'].map((path) =>
+          fetch(staticUrl(path)).then((res) => res.json()),
+        ),
+      )
+        .then(([variables, graphData]) => {
+          setEmacsVariables(variables)
+          updateGraphData(graphData)
+        })
+        .catch((e) => console.error('could not load the graph snapshot', e))
+      return
+    }
     // initialize websocket
     WebSocketRef.current = new ReconnectingWebSocket('ws://localhost:35903')
     WebSocketRef.current.addEventListener('open', () => {
