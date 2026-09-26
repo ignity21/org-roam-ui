@@ -4,6 +4,7 @@ import { NodeObject } from 'force-graph'
 import { SearchContent } from './SearchContent'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { NodeById } from '../../pages'
+import { nodeTextUrl } from '../../util/static'
 
 export const Search: React.FC<{
   nodeById: NodeById
@@ -47,7 +48,7 @@ export const Search: React.FC<{
     setContentLoading(true)
     Promise.all(
       missingIds.map((id) =>
-        fetch(`/node/${encodeURIComponent(id)}`)
+        fetch(nodeTextUrl(id))
           .then((res) => (res.ok ? res.text() : Promise.reject(res.status)))
           .then((text) => [id, text] as const)
           // A null text marks a failed fetch.

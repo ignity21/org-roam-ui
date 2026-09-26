@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { LinksByNodeId, NodeByCite, NodeById } from '../pages/index'
 import { ProcessedOrg } from './processOrg'
+import { nodeTextUrl } from './static'
 
 export interface UniOrgProps {
   nodeById: NodeById
@@ -35,9 +36,8 @@ export const UniOrg = (props: UniOrgProps) => {
 
   const [previewText, setPreviewText] = useState('')
 
-  const id = encodeURIComponent(encodeURIComponent(previewNode.id))
   useEffect(() => {
-    fetch(`http://localhost:35901/node/${id}`)
+    fetch(nodeTextUrl(previewNode.id as string))
       .then((res) => {
         return res.text()
       })

@@ -48,6 +48,7 @@ import { deleteNodeInEmacs, openNodeInEmacs, createNodeInEmacs } from '../util/w
 import { BiNetworkChart } from 'react-icons/bi'
 import { TagMenu } from './TagMenu'
 import { initialFilter, TagColors } from './config'
+import { isStatic } from '../util/static'
 
 export default interface ContextMenuProps {
   background: Boolean
@@ -125,7 +126,7 @@ export const ContextMenu = (props: ContextMenuProps) => {
                   </MenuItem>
                 </>
               )}
-              {!target?.properties?.FILELESS ? (
+              {isStatic ? null : !target?.properties?.FILELESS ? (
                 <MenuItem
                   icon={<EditIcon />}
                   onClick={() => openNodeInEmacs(target as OrgRoamNode, webSocket)}
@@ -183,7 +184,7 @@ export const ContextMenu = (props: ContextMenuProps) => {
               >
                 Preview
               </MenuItem>
-              {target?.level === 0 && (
+              {!isStatic && target?.level === 0 && (
                 <MenuItem
                   closeOnSelect={false}
                   icon={<DeleteIcon color="red.500" />}

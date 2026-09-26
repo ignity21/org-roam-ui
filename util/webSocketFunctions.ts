@@ -2,6 +2,9 @@ import { OrgRoamNode } from '../api'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 
 export function sendMessageToEmacs(command: string, data: {}, webSocket: ReconnectingWebSocket) {
+    if (!webSocket) {
+        return
+    }
     webSocket.send(JSON.stringify({ command: command, data: data }))
 }
 

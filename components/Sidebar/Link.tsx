@@ -67,6 +67,7 @@ import { defaultNoteStyle, viewerNoteStyle, outlineNoteStyle } from './noteStyle
 import { Scrollbars } from 'react-custom-scrollbars-2'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { getThemeColor } from '../../util/getThemeColor'
+import { nodeTextUrl } from '../../util/static'
 
 export const NodeLink = (props: NodeLinkProps) => {
   const {
@@ -151,7 +152,7 @@ export const PreviewLink = (props: LinkProps) => {
   const extraNoteStyle = outline ? outlineNoteStyle : viewerNoteStyle
   console.log(previewNode)
   const getText = () => {
-    fetch(`http://localhost:35901/node/${id}`)
+    fetch(nodeTextUrl(id))
       .then((res) => {
         return res.text()
       })
