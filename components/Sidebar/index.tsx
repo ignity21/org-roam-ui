@@ -52,6 +52,8 @@ export interface SidebarProps {
   macros?: { [key: string]: string }
   attachDir: string
   useInheritance: boolean
+  isNoteFullscreen: boolean
+  setIsNoteFullscreen: any
 }
 
 const Sidebar = (props: SidebarProps) => {
@@ -81,6 +83,8 @@ const Sidebar = (props: SidebarProps) => {
     macros,
     attachDir,
     useInheritance,
+    isNoteFullscreen,
+    setIsNoteFullscreen,
   } = props
 
   const { highlightColor } = useContext(ThemeContext)
@@ -102,6 +106,15 @@ const Sidebar = (props: SidebarProps) => {
   const [font, setFont] = useState('sans serif')
   const [indent, setIndent] = useState(0)
   const [collapse, setCollapse] = useState(false)
+
+  useEffect(() => {
+    if (!isNoteFullscreen) return
+    const exitOnEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsNoteFullscreen(false)
+    }
+    window.addEventListener('keydown', exitOnEscape)
+    return () => window.removeEventListener('keydown', exitOnEscape)
+  }, [isNoteFullscreen])
   //maybe want to close it when clicking outside, but not sure
   //const outsideClickRef = useRef();
   return (
@@ -115,7 +128,8 @@ const Sidebar = (props: SidebarProps) => {
       style={{ height: '100vh' }}
     >
       <Resizable
-        size={{ height: '100vh', width: sidebarWidth }}
+        // Fullscreen only overrides the width; the saved sidebarWidth comes back on exit.
+        size={{ height: '100vh', width: isNoteFullscreen ? windowWidth : sidebarWidth }}
         onResizeStop={(e, direction, ref, d) => {
           setSidebarWidth((curr: number) => curr + d.width)
         }}
@@ -123,14 +137,14 @@ const Sidebar = (props: SidebarProps) => {
           top: false,
           right: false,
           bottom: false,
-          left: true,
+          left: !isNoteFullscreen,
           topRight: false,
           bottomRight: false,
           bottomLeft: false,
           topLeft: false,
         }}
         minWidth="220px"
-        maxWidth={windowWidth - 200}
+        maxWidth={isNoteFullscreen ? windowWidth : windowWidth - 200}
       >
         <Flex flexDir="column" h="100vh" pl={2} color="black" bg="alt.100" width="100%">
           <Flex
@@ -159,6 +173,8 @@ const Sidebar = (props: SidebarProps) => {
                   setOutline,
                   collapse,
                   setCollapse,
+                  isNoteFullscreen,
+                  setIsNoteFullscreen,
                 }}
               />
             </Flex>
@@ -212,6 +228,9 @@ const Sidebar = (props: SidebarProps) => {
                 alignItems="left"
                 bg="alt.100"
                 paddingLeft={4}
+                // Keep lines readable when the note spans the whole window.
+                maxW={isNoteFullscreen ? '4xl' : undefined}
+                mx={isNoteFullscreen ? 'auto' : undefined}
               >
                 <Title previewNode={previewRoamNode} />
                 <TagBar

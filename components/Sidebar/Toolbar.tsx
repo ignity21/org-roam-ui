@@ -1,7 +1,7 @@
 import React from 'react'
 import { Flex, IconButton, ButtonGroup, Tooltip } from '@chakra-ui/react'
 import { BiAlignJustify, BiAlignLeft, BiAlignMiddle, BiAlignRight } from 'react-icons/bi'
-import { MdOutlineExpand, MdOutlineCompress } from 'react-icons/md'
+import { MdOutlineExpand, MdOutlineCompress, MdFullscreen, MdFullscreenExit } from 'react-icons/md'
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
 import { IoIosListBox, IoMdListBox } from 'react-icons/io'
 
@@ -20,6 +20,8 @@ export interface ToolbarProps {
   setOutline: any
   collapse: boolean
   setCollapse: any
+  isNoteFullscreen: boolean
+  setIsNoteFullscreen: any
 }
 
 export const Toolbar = (props: ToolbarProps) => {
@@ -38,6 +40,8 @@ export const Toolbar = (props: ToolbarProps) => {
     setOutline,
     collapse,
     setCollapse,
+    isNoteFullscreen,
+    setIsNoteFullscreen,
   } = props
   return (
     <Flex flex="0 1 40px" pb={3} alignItems="center" justifyContent="space-between" pr={1}>
@@ -95,6 +99,14 @@ export const Toolbar = (props: ToolbarProps) => {
             aria-label="Toggle headers"
             icon={collapse ? <MdOutlineExpand /> : <MdOutlineCompress />}
             onClick={() => setCollapse((curr: boolean) => !curr)}
+          />
+        </Tooltip>
+        <Tooltip label={isNoteFullscreen ? 'Exit full window (Esc)' : 'Fill the window'}>
+          <IconButton
+            variant="subtle"
+            aria-label="Toggle full window"
+            icon={isNoteFullscreen ? <MdFullscreenExit /> : <MdFullscreen />}
+            onClick={() => setIsNoteFullscreen((curr: boolean) => !curr)}
           />
         </Tooltip>
         {/* <Tooltip label="Indent trees">

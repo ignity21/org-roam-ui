@@ -147,6 +147,11 @@ export function GraphPage() {
   } = previewNodeState
   const [sidebarHighlightedNode, setSidebarHighlightedNode] = useState<OrgRoamNode | null>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  // The note sidebar widened to the whole window; left when the sidebar closes.
+  const [isNoteFullscreen, setIsNoteFullscreen] = useState(false)
+  useEffect(() => {
+    if (!isOpen) setIsNoteFullscreen(false)
+  }, [isOpen])
 
   const nodeByIdRef = useRef<NodeById>({})
   const linksByNodeIdRef = useRef<LinksByNodeId>({})
@@ -570,29 +575,31 @@ export function GraphPage() {
         height="100vh"
         overflow="clip"
       >
-        <Tweaks
-          {...{
-            physics,
-            setPhysics,
-            threeDim,
-            setThreeDim,
-            filter,
-            setFilter,
-            visuals,
-            setVisuals,
-            mouse,
-            setMouse,
-            behavior,
-            setBehavior,
-            tagColors,
-            setTagColors,
-            coloring,
-            setColoring,
-            local,
-            setLocal,
-          }}
-          tags={tagsRef.current}
-        />
+        {!isNoteFullscreen && (
+          <Tweaks
+            {...{
+              physics,
+              setPhysics,
+              threeDim,
+              setThreeDim,
+              filter,
+              setFilter,
+              visuals,
+              setVisuals,
+              mouse,
+              setMouse,
+              behavior,
+              setBehavior,
+              tagColors,
+              setTagColors,
+              coloring,
+              setColoring,
+              local,
+              setLocal,
+            }}
+            tags={tagsRef.current}
+          />
+        )}
         <Box position="absolute">
           {graphData && (
             <Graph
@@ -631,7 +638,12 @@ export function GraphPage() {
             />
           )}
         </Box>
-        <Box position="relative" zIndex={4} width="100%">
+        <Box
+          position="relative"
+          zIndex={4}
+          width="100%"
+          display={isNoteFullscreen ? 'none' : undefined}
+        >
           <Flex className="headerBar" h={10} flexDir="column">
             <Flex alignItems="center" h={10} justifyContent="flex-end">
               {/* <Flex flexDir="row" alignItems="center">
@@ -701,6 +713,8 @@ export function GraphPage() {
               setTagColors,
               filter,
               setFilter,
+              isNoteFullscreen,
+              setIsNoteFullscreen,
             }}
             macros={emacsVariables.katexMacros}
             attachDir={emacsVariables.attachDir || ''}
