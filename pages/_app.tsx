@@ -7,10 +7,12 @@ import * as d3int from 'd3-interpolate'
 import { ThemeContext } from '../util/themecontext'
 import { usePersistantState } from '../util/persistant-state'
 import { themes } from '../components/themes'
+import { isStatic } from '../util/static'
 
 function MyApp({ Component, pageProps }: AppProps) {
   type Theme = [string, { [color: string]: string }]
-  const initialTheme: Theme = ['one-vibrant', themes['one-vibrant']]
+  const initialThemeName = isStatic ? 'ayu-light' : 'one-vibrant'
+  const initialTheme: Theme = [initialThemeName, themes[initialThemeName]]
   const [isInitialized, setIsInitialized] = useState(false)
 
   const [emacsTheme, setEmacsTheme] = useState<Theme>(initialTheme)
