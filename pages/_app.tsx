@@ -29,10 +29,13 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [highlightColor])
 
   useEffect(() => {
-    setEmacsTheme(
+    const storedTheme: Theme =
       JSON.parse(localStorage.getItem('colorTheme') ?? JSON.stringify(initialTheme)) ??
-        initialTheme,
-    )
+      initialTheme
+    // Take a bundled theme's colors from the current build, not from the copy
+    // saved with an older build.
+    const [storedName] = storedTheme
+    setEmacsTheme(themes[storedName] ? [storedName, themes[storedName]] : storedTheme)
     setHighlightColor(
       JSON.parse(localStorage.getItem('highlightColor') ?? JSON.stringify(highlightColor)) ??
         highlightColor,
