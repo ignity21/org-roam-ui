@@ -187,6 +187,44 @@ export const defaultNoteStyle = {
     //color: '#555',
     backgroundColor: 'white',
   },
+  // Tables: ruled cells, a shaded header and striped rows, scrolling sideways
+  // when wider than the note.
+  table: {
+    display: 'block',
+    width: 'fit-content',
+    maxWidth: '100%',
+    overflowX: 'auto',
+    borderCollapse: 'collapse',
+    fontSize: '13',
+    my: 3,
+  },
+  'th, td': {
+    borderWidth: '1px',
+    borderColor: 'gray.400',
+    px: 3,
+    py: 1.5,
+    textAlign: 'left',
+    verticalAlign: 'top',
+  },
+  th: {
+    backgroundColor: 'gray.200',
+    fontWeight: 'bold',
+  },
+  'tbody tr:nth-of-type(even)': {
+    backgroundColor: 'alt.100',
+  },
+  // Syntax highlighting from rehype-highlight, in the Emacs theme's colors.
+  '.hljs-comment, .hljs-quote, .hljs-doctag': { color: 'gray.600', fontStyle: 'italic' },
+  '.hljs-keyword, .hljs-name, .hljs-selector-tag, .hljs-meta-keyword': { color: 'blue.500' },
+  '.hljs-built_in, .hljs-builtin-name, .hljs-title, .hljs-section': { color: 'pink.500' },
+  '.hljs-string, .hljs-regexp, .hljs-meta-string, .hljs-addition': { color: 'green.500' },
+  '.hljs-number, .hljs-symbol, .hljs-bullet': { color: 'orange.500' },
+  '.hljs-literal, .hljs-variable.language_': { color: 'purple.500' },
+  '.hljs-type, .hljs-class .hljs-title': { color: 'yellow.500' },
+  '.hljs-meta, .hljs-attr, .hljs-attribute, .hljs-template-variable': { color: 'cyan.500' },
+  '.hljs-deletion, .hljs-selector-id, .hljs-selector-class': { color: 'red.500' },
+  '.hljs-emphasis': { fontStyle: 'italic' },
+  '.hljs-strong': { fontWeight: 'bold' },
   'caption.t-above': { captionSide: 'top' },
   'caption.t-bottom': { captionSide: 'bottom' },
   'th.org-right': { textAlign: 'center' },
@@ -201,6 +239,6 @@ export const defaultNoteStyle = {
   '.figure p': { textAlign: 'center' },
   '.math.math-display .katex': {
     overflow: 'auto',
-    minHeight: '1.5em'
-  }
+    minHeight: '1.5em',
+  },
 }

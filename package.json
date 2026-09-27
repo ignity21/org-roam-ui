@@ -30,6 +30,7 @@
     "hast-to-hyperscript": "^9.0.1",
     "hast-util-to-string": "1",
     "hastscript": "^6.0.0",
+    "highlight.js": "~10.7.0",
     "jlouvain.js": "^1.0.0",
     "next": "^11.1.0",
     "orgast-util-to-string": "^0.4.5",

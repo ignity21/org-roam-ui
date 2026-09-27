@@ -5,9 +5,7 @@ import uniorg2rehype from 'uniorg-rehype'
 import uniorgSlug from 'uniorg-slug'
 import extractKeywords from 'uniorg-extract-keywords'
 import attachments from 'uniorg-attach'
-// rehypeHighlight does not have any types
-// add error thing here
-// import highlight from 'rehype-highlight'
+import { rehypeHighlight, highlightOptions } from './highlight'
 import katex from 'rehype-katex'
 import 'katex/dist/katex.css'
 import rehype2react from 'rehype-react'
@@ -122,7 +120,6 @@ export const ProcessedOrg = (props: ProcessedOrgProps) => {
     .use(remarkGFM)
     .use(remarkRehype)
   //.data('settings', { fragment: true })
-  // .use(highlight)
 
   const isMarkdown = previewNode?.file?.slice(-3) === '.md'
   const baseProcessor = isMarkdown ? mdProcessor : orgProcessor
@@ -140,6 +137,7 @@ export const ProcessedOrg = (props: ProcessedOrgProps) => {
             ...macros,
           },
         })
+        .use(rehypeHighlight, highlightOptions)
         .use(rehype2react, {
           createElement: React.createElement,
           // eslint-disable-next-line react/display-name
