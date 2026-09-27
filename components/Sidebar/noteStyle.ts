@@ -6,23 +6,12 @@ export const viewerNoteStyle = {
   '.outlineHeadingButton': {
     display: 'none',
   },
-  h1: { color: 'black', lineHeight: '1.2', fontSize: '16', fontWeight: 'bold', paddingTop: 2 },
-  h2: {
-    fontSize: '14',
+  // Org headings of every level share one size, a step above the body text.
+  'h1,h2,h3,h4,h5,h6,h7,h8': {
     color: 'black',
+    lineHeight: '1.25',
+    fontSize: '16px',
     fontWeight: 'bold',
-    fontStyle: 'bold italic',
-    paddingTop: 2,
-  },
-  h3: {
-    fontSize: '13',
-    color: 'black',
-    paddingTop: 2,
-  },
-  h4: {
-    fontSize: '12',
-    fontStyle: 'italic',
-    color: 'black',
     paddingTop: 2,
   },
 
@@ -58,7 +47,7 @@ export const outlineNoteStyle = {
     pl: 1,
     lineHeight: '1.25',
     color: 'black',
-    fontSize: 15,
+    fontSize: '16px',
     fontWeight: 700,
   },
   '.sec': {
@@ -69,12 +58,13 @@ export const outlineNoteStyle = {
   },
   p: {
     fontWeight: 500,
-    fontSize: 14,
     pb: 2,
   },
 }
 
 export const defaultNoteStyle = {
+  // Body text size; headings sit a step above it and code a step below.
+  fontSize: '15px',
   '.katex': { overflowX: 'scroll' },
   ol: {
     paddingLeft: 4,
@@ -91,7 +81,6 @@ export const defaultNoteStyle = {
     paddingLeft: '5',
   },
   p: {
-    fontSize: '14',
     fontWeight: '500 !important',
     pb: 2,
   },
@@ -171,8 +160,12 @@ export const defaultNoteStyle = {
     backgroundColor: 'white',
     padding: '8pt',
     fontFamily: 'monospace',
+    fontSize: '14px',
     overflow: 'auto',
     margin: '1.2em',
+  },
+  ':not(pre) > code': {
+    fontSize: '0.93em',
   },
   'pre.src': {
     position: 'relative',
@@ -195,7 +188,7 @@ export const defaultNoteStyle = {
     maxWidth: '100%',
     overflowX: 'auto',
     borderCollapse: 'collapse',
-    fontSize: '13',
+    fontSize: '14px',
     my: 3,
   },
   'th, td': {
