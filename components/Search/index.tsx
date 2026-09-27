@@ -48,14 +48,20 @@ export const Search: React.FC<{
     Promise.all(
       missingIds.map((id) =>
         fetch(`/node/${encodeURIComponent(id)}`)
-          .then((res) => res.text())
+          .then((res) => (res.ok ? res.text() : Promise.reject(res.status)))
           .then((text) => [id, text] as const)
-          .catch(() => [id, ''] as const),
+          // A null text marks a failed fetch.
+          .catch(() => [id, null] as const),
       ),
     ).then((entries) => {
       setContentById((current) => {
         const next = { ...current }
         entries.forEach(([id, text]) => {
+          if (text === null) {
+            // Retry on the next time search is opened.
+            fetchedIdsRef.current.delete(id)
+            return
+          }
           next[id] = text
         })
         return next

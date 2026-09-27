@@ -33,7 +33,9 @@ export const SearchResultItem: React.FC<Props> = ({ match, onClick }) => {
   const { highlightColor, emacsTheme } = useContext(ThemeContext)
   type Theme = { [color: string]: string }
   const themeColors = emacsTheme[1] as Theme
-  const { id, tags, title } = match.node
+  const { id, title } = match.node
+  // Untagged nodes arrive from Emacs with tags `[null]`.
+  const tags = match.node.tags?.filter((tag) => !!tag)
 
   const excerpt = useMemo(() => {
     if (match.category === 'title') {
