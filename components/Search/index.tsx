@@ -4,7 +4,31 @@ import { NodeObject } from 'force-graph'
 import { SearchContent } from './SearchContent'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { NodeById } from '../../pages'
-import { nodeTextUrl } from '../../util/static'
+import { isStatic, nodeTextUrl, staticUrl } from '../../util/static'
+
+type NoteText = readonly [id: string, text: string | null]
+
+const fetchText = (url: string) =>
+  fetch(url).then((res) => (res.ok ? res.text() : Promise.reject(res.status)))
+
+// Fetch the full text of each note in IDS; a null text marks a failed fetch.
+// A static snapshot bundles every note into one file, so a search doesn't
+// fire hundreds of requests at the static host.
+const fetchNoteTexts = (ids: string[]): Promise<NoteText[]> =>
+  isStatic
+    ? fetchText(staticUrl('data/notes.json'))
+        .then((json) => {
+          const texts: { [id: string]: string } = JSON.parse(json)
+          return ids.map((id): NoteText => [id, texts[id] ?? ''])
+        })
+        .catch(() => ids.map((id): NoteText => [id, null]))
+    : Promise.all(
+        ids.map((id) =>
+          fetchText(nodeTextUrl(id))
+            .then((text): NoteText => [id, text])
+            .catch((): NoteText => [id, null]),
+        ),
+      )
 
 export const Search: React.FC<{
   nodeById: NodeById
@@ -46,15 +70,7 @@ export const Search: React.FC<{
     }
     missingIds.forEach((id) => fetchedIdsRef.current.add(id))
     setContentLoading(true)
-    Promise.all(
-      missingIds.map((id) =>
-        fetch(nodeTextUrl(id))
-          .then((res) => (res.ok ? res.text() : Promise.reject(res.status)))
-          .then((text) => [id, text] as const)
-          // A null text marks a failed fetch.
-          .catch(() => [id, null] as const),
-      ),
-    ).then((entries) => {
+    fetchNoteTexts(missingIds).then((entries) => {
       setContentById((current) => {
         const next = { ...current }
         entries.forEach(([id, text]) => {
