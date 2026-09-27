@@ -1,4 +1,5 @@
 import { Easing } from '@tweenjs/tween.js'
+import { isStatic } from '../util/static'
 const options: string[] = []
 const algorithms: { [name: string]: (percent: number) => number } = {}
 for (let type in Easing) {
@@ -40,7 +41,9 @@ export const initialFilter = {
   tagsBlacklist: [],
   tagsWhitelist: [],
   dirsBlocklist: [],
-  dirsAllowlist: [],
+  // The published snapshot opens on the Inbox notes only; remove it under
+  // Directory filters to see the whole graph.
+  dirsAllowlist: isStatic ? ['Inbox/'] : [],
   bad: true,
   nodes: [],
   links: [],
