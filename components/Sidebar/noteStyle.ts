@@ -164,8 +164,19 @@ export const defaultNoteStyle = {
     overflow: 'auto',
     margin: '1.2em',
   },
+  // Inline ~code~ takes the code block background; =verbatim= a paler one,
+  // half-way between the code block and the sidebar.
   ':not(pre) > code': {
     fontSize: '0.93em',
+    px: '0.3em',
+    py: '0.1em',
+    borderRadius: '3px',
+  },
+  'code.inline-code': {
+    backgroundColor: 'white',
+  },
+  'code.inline-verbatim': {
+    backgroundColor: 'color-mix(in srgb, var(--chakra-colors-white) 50%, transparent)',
   },
   'pre.src': {
     position: 'relative',
