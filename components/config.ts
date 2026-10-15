@@ -41,9 +41,9 @@ export const initialFilter = {
   tagsBlacklist: [],
   tagsWhitelist: [],
   dirsBlocklist: [],
-  // The published snapshot opens on the Inbox notes only; remove it under
+  // The published snapshot opens on the Unsorted notes only; remove it under
   // Directory filters to see the whole graph.
-  dirsAllowlist: isStatic ? ['Inbox/'] : [],
+  dirsAllowlist: isStatic ? ['Unsorted/'] : [],
   bad: true,
   nodes: [],
   links: [],
