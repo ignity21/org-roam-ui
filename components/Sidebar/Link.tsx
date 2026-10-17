@@ -26,6 +26,7 @@ import { ProcessedOrg } from '../../util/processOrg'
 import 'katex/dist/katex.css'
 // import rehype2react from 'rehype-react'
 import { ThemeContext } from '../../util/themecontext'
+import { resourcePath, resourceUrl } from '../../util/resource'
 import { LinksByNodeId, NodeByCite, NodeById } from '../../pages'
 
 export interface LinkProps {
@@ -309,6 +310,16 @@ export const PreviewLink = (props: LinkProps) => {
       </>
     )
   }
+
+  // Resources such as HTML demos open in a new tab; links to other org
+  // files are left inert, as notes link to each other by id.
+  if (type === 'file' && previewNode?.file && !/\.org(::.*)?$/.test(href)) {
+    const url = resourceUrl(resourcePath(href, previewNode.file))
+    if (url) {
+      return <NormalLink href={url}>{children}</NormalLink>
+    }
+  }
+
   return (
     <Text as="span" display="inline" className={href} color="base.700" cursor="not-allowed">
       {children}
