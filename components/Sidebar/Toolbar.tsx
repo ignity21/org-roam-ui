@@ -44,7 +44,8 @@ export const Toolbar = (props: ToolbarProps) => {
     setIsNoteFullscreen,
   } = props
   return (
-    <Flex flex="0 1 40px" pb={3} alignItems="center" justifyContent="space-between" pr={1}>
+    // Wrap rather than clip: a clipped toolbar loses its last buttons, full window among them.
+    <Flex flex="1 1 auto" pb={3} alignItems="center" flexWrap="wrap" pr={1}>
       <Flex>
         <ButtonGroup isAttached>
           <Tooltip label="Go backward">

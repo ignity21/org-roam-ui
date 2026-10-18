@@ -90,6 +90,9 @@ const Sidebar = (props: SidebarProps) => {
   const { highlightColor } = useContext(ThemeContext)
   const [previewRoamNode, setPreviewRoamNode] = useState<OrgRoamNode | undefined>()
   const [sidebarWidth, setSidebarWidth] = usePersistantState<number>('sidebarWidth', 400)
+  // Leave 200px of graph beside the sidebar; on a phone held upright that would squeeze the
+  // sidebar below its minimum, so leave only the header buttons (settings, search, sidebar).
+  const maxSidebarWidth = windowWidth < 600 ? windowWidth - 136 : windowWidth - 200
 
   useEffect(() => {
     if (!previewNode?.id) {
@@ -144,7 +147,7 @@ const Sidebar = (props: SidebarProps) => {
           topLeft: false,
         }}
         minWidth="220px"
-        maxWidth={isNoteFullscreen ? windowWidth : windowWidth - 200}
+        maxWidth={isNoteFullscreen ? windowWidth : maxSidebarWidth}
       >
         <Flex flexDir="column" h="100vh" pl={2} color="black" bg="alt.100" width="100%">
           <Flex
@@ -152,11 +155,12 @@ const Sidebar = (props: SidebarProps) => {
             // overflow="hidden"
             // textOverflow="ellipsis"
             pl={2}
-            alignItems="center"
+            // The toolbar wraps in a narrow sidebar; keep the options button on its first row.
+            alignItems="flex-start"
             color="black"
             width="100%"
           >
-            <Flex pt={1} flexShrink={0}>
+            <Flex pt={1} minW={0}>
               <Toolbar
                 {...{
                   setJustification,
