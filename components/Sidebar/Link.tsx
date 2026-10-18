@@ -125,6 +125,34 @@ export const NormalLink = (props: NormalLinkProps) => {
   )
 }
 
+// Links to a heading in the same note, such as those in a toc-org table of
+// contents.  uniorg-slug gives headings GitHub-style ids, which is also how
+// toc-org builds its links.  The search stays within the rendered note, as
+// hover previews of other notes may carry the same ids.
+export const HeadingLink = (props: NormalLinkProps) => {
+  const { href, children } = props
+  const { highlightColor } = useContext(ThemeContext)
+  return (
+    <Link
+      color={highlightColor}
+      href={href}
+      onClick={(e) => {
+        e.preventDefault()
+        let id = href.slice(1)
+        try {
+          id = decodeURIComponent(id)
+        } catch {}
+        const root = e.currentTarget.closest('.org, .chakra-popover__body') ?? document
+        root
+          .querySelector(`[id="${CSS.escape(id)}"]`)
+          ?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      }}
+    >
+      {children}
+    </Link>
+  )
+}
+
 export const PreviewLink = (props: LinkProps) => {
   const {
     href,
@@ -180,6 +208,10 @@ export const PreviewLink = (props: LinkProps) => {
     }
     getText()
   }, [hover, orgText])
+
+  if (href.startsWith('#')) {
+    return <HeadingLink href={href}>{children}</HeadingLink>
+  }
 
   if (!type) {
     return <Text color="gray.700">{children}</Text>
