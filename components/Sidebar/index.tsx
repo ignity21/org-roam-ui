@@ -93,6 +93,7 @@ const Sidebar = (props: SidebarProps) => {
   // Leave 200px of graph beside the sidebar; on a phone held upright that would squeeze the
   // sidebar below its minimum, so leave only the header buttons (settings, search, sidebar).
   const maxSidebarWidth = windowWidth < 600 ? windowWidth - 136 : windowWidth - 200
+  const scrollbarsRef = useRef<Scrollbars>(null)
 
   useEffect(() => {
     if (!previewNode?.id) {
@@ -101,6 +102,8 @@ const Sidebar = (props: SidebarProps) => {
     }
     onOpen()
     setPreviewRoamNode(previewNode as OrgRoamNode)
+    // The scroll container stays mounted across notes, so start each note at the top.
+    scrollbarsRef.current?.scrollToTop()
   }, [previewNode?.id])
 
   const [justification, setJustification] = usePersistantState('justification', 1)
@@ -210,6 +213,7 @@ const Sidebar = (props: SidebarProps) => {
             </Flex>
           </Flex>
           <Scrollbars
+            ref={scrollbarsRef}
             //autoHeight
             //autoHeightMax={600}
             autoHide
